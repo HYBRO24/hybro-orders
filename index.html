@@ -312,12 +312,17 @@ function modal(title,body,hasInput,ph,okLabel,okCls,cb){
   const inp=document.getElementById('mInput');
   if(hasInput){inp.style.display='';inp.placeholder=ph||'';inp.value='';setTimeout(()=>inp.focus(),50);}
   else inp.style.display='none';
-  document.getElementById('mBtns').innerHTML=`<button class="btn" onclick="mClose()">Скасувати</button><button class="btn ${okCls||'btn-p'}" onclick="mOk()">${okLabel}</button>`;
+  const btns=document.getElementById('mBtns');
+  btns.innerHTML=`<button class="btn" id="mCancelBtn">Скасувати</button><button class="btn ${okCls||'btn-p'}" id="mOkBtn">${okLabel}</button>`;
+  document.getElementById('mCancelBtn').addEventListener('click',mClose);
+  document.getElementById('mOkBtn').addEventListener('click',()=>{
+    const v=document.getElementById('mInput').value.trim();
+    mClose();
+    if(cb) cb(v);
+  });
   document.getElementById('mOverlay').classList.add('open');
-  window._mcb=cb;
 }
-function mOk(){const v=document.getElementById('mInput').value.trim();mClose();if(window._mcb)window._mcb(v);}
-function mClose(){document.getElementById('mOverlay').classList.remove('open');window._mcb=null;}
+function mClose(){document.getElementById('mOverlay').classList.remove('open');}
 
 async function doLogin(){
   const r=document.getElementById('lRole').value,p=document.getElementById('lPin').value;
@@ -497,7 +502,7 @@ function renderAct(){
   }
   document.getElementById('oAct').innerHTML=h;
 }
-function execApprove(){modal('Погодити замовлення','Підтверджуєте дату виконання і склад замовлення?',false,'','Погодити','btn-g',()=>chStatus('approved'));}
+function execApprove(){modal('Погодити замовлення','Підтверджуєте дату виконання і склад замовлення?',false,'','Погодити','btn-g',()=>{chStatus('approved');goList();});}
 
 let openGroup=null;
 function toggleGroup(g){openGroup=openGroup===g?null:g;renderCat();}
